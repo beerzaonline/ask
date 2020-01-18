@@ -11,6 +11,7 @@ import com.rmuti.ecp.ask.model.service.CommentRepository;
 import com.rmuti.ecp.ask.model.table.Comment;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/comment")
@@ -42,6 +43,21 @@ public class CommentController {
         }else {
             res.setStatus(0);
             res.setData(commentRepository.findAllComment(topicId));
+        }
+        return res;
+    }
+
+    @PostMapping("/delete")
+    public Object Delete(@RequestParam int commentId){
+        APIResponse res = new APIResponse();
+        Optional<Comment> comment_db = commentRepository.findById(commentId);
+        if(comment_db.isPresent()){
+            commentRepository.deleteById(commentId);
+            res.setStatus(0);
+            res.setMessage("ลบความเห็นเรียบร้อยแล้ว");
+        }else {
+            res.setStatus(1);
+            res.setMessage("ผิดพลาด");
         }
         return res;
     }

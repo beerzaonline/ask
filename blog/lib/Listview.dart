@@ -6,6 +6,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/rendering.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sweetalert/sweetalert.dart';
 import 'config.dart';
 import 'package:flutter/material.dart';
@@ -54,6 +55,7 @@ class _listview extends State {
   List lstData = List();
   TextEditingController _nameTopic = TextEditingController();
   TextEditingController _description = TextEditingController();
+  String _username;
 
   void initState() {
     super.initState();
@@ -68,12 +70,20 @@ class _listview extends State {
     //     }
     //   }
     // });
+    _getUserName().then((username) => _username = username);
     _body();
+  }
+
+  Future<String> _getUserName() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String str = await prefs.getString('username');
+    return str;
   }
 
   void _body() {
     http.post('${config.API_url}/topic/list',
-        body: {"typeId": _typeId.toString()}).then((response) {          
+        body: {"typeId": _typeId.toString()}).then((response) {
+      print(response.body);
       Map ret = jsonDecode(response.body) as Map;
       List jsonData = ret["data"];
 
@@ -98,6 +108,7 @@ class _listview extends State {
                     Padding(
                       padding: EdgeInsets.all(5.0),
                       child: Row(
+//                        mainAxisSize: MainAxisSize.min,
                         children: <Widget>[
                           Expanded(
                             child: Text(
@@ -108,6 +119,43 @@ class _listview extends State {
                                   color: Colors.white),
                             ),
                           ),
+                          topic[2] == _username
+                              ? IconButton(
+                                  icon: Icon(Icons.clear),
+                                  color: Colors.white,
+                                  onPressed: () {
+                                    Alert(
+                                      context: context,
+                                      type: AlertType.info,
+                                      title: "คุณต้องการลบหัวข้อ ${topic[1]}?",
+                                      buttons: [
+                                        DialogButton(
+                                          child: Text(
+                                            "ตกลง",
+                                            style: TextStyle(color: Colors.white, fontSize: 20),
+                                          ),
+                                          onPressed: () {
+//                                            http.post('${config.API_url}/topic/delete',
+//                                                body: {
+//                                                  "topicId": topic[0]
+//                                                }).then((response) {
+//                                              print(response.body);
+//                                            });
+                                          },
+                                          width: 120,
+                                        ),
+                                        DialogButton(
+                                          child: Text(
+                                            "ยกเลิก",
+                                            style: TextStyle(color: Colors.white, fontSize: 20),
+                                          ),
+                                          onPressed: () => Navigator.pop(context),
+                                          width: 120,
+                                        )
+                                      ],
+                                    ).show();
+                                  })
+                              : Padding(padding: EdgeInsets.all(0))
                         ],
                       ),
                     ),
@@ -210,7 +258,7 @@ class _listview extends State {
       Map res = jsonDecode(respone.body) as Map;
       int status = res['status'];
       int _topicId = res['data'];
-      
+
       if (status == 0) {
         upload(_image, _topicId);
       }
@@ -309,7 +357,7 @@ class _listview extends State {
                     padding: EdgeInsets.only(left: 15, right: 15, top: 15),
                     child: FloatingActionButton(
                       onPressed: getImageCamera,
-                      tooltip: 'เลือกรูปหอพัก',
+                      tooltip: 'เลือกรูป',
                       child: Icon(Icons.add_a_photo),
                     ),
                   ),
@@ -318,6 +366,7 @@ class _listview extends State {
             ),
             actions: <Widget>[
               new RaisedButton(
+                color: Colors.blueAccent,
                 child: Text(
                   'ตกลง',
                   style: TextStyle(color: Colors.white),
@@ -325,6 +374,7 @@ class _listview extends State {
                 onPressed: onSave,
               ),
               new RaisedButton(
+                color: Colors.redAccent,
                 child: Text(
                   'ยกเลิก',
                   style: TextStyle(color: Colors.white),

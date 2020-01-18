@@ -11,6 +11,8 @@ import com.rmuti.ecp.ask.model.service.UserProfileRepository;
 import com.rmuti.ecp.ask.model.table.Topic;
 import com.rmuti.ecp.ask.model.table.UserProfile;
 
+import java.util.Optional;
+
 @RestController
 @RequestMapping("/topic")
 public class TopicController {
@@ -37,6 +39,21 @@ public class TopicController {
     public Object FindTopic(@RequestParam String topicId, @RequestParam String userId) {
         APIResponse res = new APIResponse();
         res.setData(topicRepository.findTopic(topicId, userId));
+        return res;
+    }
+
+    @PostMapping("/delete")
+    public Object Delete(@RequestParam int topicId) {
+        APIResponse res = new APIResponse();
+        Optional<Topic> topic_db = topicRepository.findById(topicId);
+        if (topic_db.isPresent()) {
+            topicRepository.deleteById(topicId);
+            res.setStatus(0);
+            res.setMessage("ลบหัวข้อเรียบร้อยแล้ว");
+        } else {
+            res.setStatus(1);
+            res.setMessage("ผิดพลาด");
+        }
         return res;
     }
 }

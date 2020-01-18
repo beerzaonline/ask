@@ -15,6 +15,11 @@ import 'dart:convert';
 //   ));
 // }
 
+Future<void> _saveUserName(String username) async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  await prefs.setString('username', username);
+}
+
 Future<void> _login(int id) async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
   await prefs.setInt('id', id);
@@ -68,12 +73,14 @@ class _Login extends State {
     reqData["userName"] = userName.text;
     reqData["passWord"] = passWord.text;
     http.post('${config.API_url}/user/login', body: reqData).then((response) {
+      print(response.body);
       Map jsonMap = jsonDecode(response.body) as Map;
       int status = jsonMap["status"];
       int data = jsonMap["data"];
 
       if (status == 0) {
         _login(data);
+        _saveUserName(userName.text);
         Navigator.pop(context);
         Navigator.pushReplacement(context,
             MaterialPageRoute(builder: (BuildContext context) => home(data)));

@@ -9,7 +9,7 @@ com/rmuti/ecp/ask/controller/TopicController.class
 com/rmuti/ecp/ask/model/bean/APIResponse.class
 com/rmuti/ecp/ask/model/table/UserProfile.class
 com/rmuti/ecp/ask/DemoApplication.class
-com/rmuti/ecp/ask/model/service/TypeRepository.class
 com/rmuti/ecp/ask/model/table/Type.class
+com/rmuti/ecp/ask/model/service/TypeRepository.class
 com/rmuti/ecp/ask/model/table/Comment.class
 com/rmuti/ecp/ask/model/table/Topic.class

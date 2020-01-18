@@ -55,6 +55,7 @@ class _Register extends State {
       http
           .post('${config.API_url}/user/register', body: param)
           .then((response) {
+            print(response.body);
         Map resMap = jsonDecode(response.body) as Map;
         int status = resMap['status'];
         if (status == 0) {

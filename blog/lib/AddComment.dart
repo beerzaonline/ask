@@ -49,6 +49,7 @@ class _Comment extends State {
       "topicId": _topicId.toString(),
       "userId": _userId.toString()
     }).then((respone) {
+      print(respone.body);
       Map res = jsonDecode(respone.body) as Map;
       List temp = res["data"];
 
@@ -139,6 +140,7 @@ class _Comment extends State {
     ///////////////////////////////////////////////////////////////POST/////////////////////////////////////////////
     http.post('${config.API_url}/comment/findAllComment',
         body: {"topicId": _topicId.toString()}).then((response) {
+          print(response.body);
       Map res = jsonDecode(response.body);
 
       if (res["status"] == 0) {
@@ -362,6 +364,7 @@ class _Comment extends State {
             ),
             actions: <Widget>[
               new RaisedButton(
+                color: Colors.blueAccent,
                 onPressed: onSummit,
                 child: Text(
                   'ตกลง',
@@ -369,6 +372,7 @@ class _Comment extends State {
                 ),
               ),
               new RaisedButton(
+                color: Colors.redAccent,
                 child: Text(
                   'ยกเลิก',
                   style: TextStyle(color: Colors.white),
