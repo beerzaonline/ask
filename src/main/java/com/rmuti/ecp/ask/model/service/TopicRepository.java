@@ -14,6 +14,6 @@ public interface TopicRepository extends JpaRepository<Topic, Integer> {
             " where a.user_id = b.id and a.type_id = ?1 and c.id = ?1", nativeQuery = true)
     List<Object[]> findListView(int typeId);
 
-    @Query(value = "select a.name,a.description,b.user_name from topic a, user_profile b where a.id = :topicId and b.id = :userId",nativeQuery = true)
-    List<Object[]> findTopic(@Param("topicId") String topicId,@Param("userId") String userId);
+    @Query(value = "select a.name,a.description,b.user_name from topic a, user_profile b where a.id = ?1 and b.id = ?2",nativeQuery = true)
+    List<Object[]> findTopic(String topicId, String userId);
 }

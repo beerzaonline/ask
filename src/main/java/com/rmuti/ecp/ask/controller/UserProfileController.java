@@ -45,20 +45,20 @@ public class UserProfileController {
         return res;
     }
 
-    @PostMapping("/changeStatus")
-    public Object changeStatus(@RequestParam int userId, @RequestParam int status) {
-        APIResponse res = new APIResponse();
-        userProfileRepository.saveStatus(userId, status);
-        res.setMessage("OK");
-        return res;
-
-    }
-
-    @PostMapping("/checkStatus")
-    public Object checkStatus(@RequestParam int userId) {
-        APIResponse res = new APIResponse();
-        res.setData(userProfileRepository.findByloginStatusAndId(userId));
-        res.setMessage("OK");
-        return res;
-    }
+//    @PostMapping("/changeStatus")
+//    public Object changeStatus(@RequestParam int userId, @RequestParam int status) {
+//        APIResponse res = new APIResponse();
+//        userProfileRepository.saveStatus(userId, status);
+//        res.setMessage("OK");
+//        return res;
+//
+//    }
+//
+//    @PostMapping("/checkStatus")
+//    public Object checkStatus(@RequestParam int userId) {
+//        APIResponse res = new APIResponse();
+//        res.setData(userProfileRepository.findByloginStatusAndId(userId));
+//        res.setMessage("OK");
+//        return res;
+//    }
 }

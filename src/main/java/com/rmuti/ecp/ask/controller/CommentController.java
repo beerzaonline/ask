@@ -23,6 +23,7 @@ public class CommentController {
     public Object save(Comment comment) {
         APIResponse res = new APIResponse();
         commentRepository.save(comment);
+        res.setData(comment.getId());
         return res;
     }
 
@@ -42,7 +43,7 @@ public class CommentController {
             res.setMessage("ไม่มีข้อมูล");
         }else {
             res.setStatus(0);
-            res.setData(commentRepository.findAllComment(topicId));
+            res.setData(a);
         }
         return res;
     }

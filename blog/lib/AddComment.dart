@@ -7,6 +7,7 @@ import 'package:http/http.dart' as http;
 import 'package:path/path.dart' as path;
 import 'package:image_picker/image_picker.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sweetalert/sweetalert.dart';
 import 'config.dart';
 
@@ -38,10 +39,18 @@ class _Comment extends State {
       TextEditingController();
   final TextEditingController _comment = TextEditingController();
   File _image;
+  String _username;
 
   void initState() {
     super.initState();
+    _getUserName().then((username) => _username = username);
     _topic();
+  }
+
+  Future<String> _getUserName() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String str = await prefs.getString('username');
+    return str;
   }
 
   void _topic() async {
@@ -139,110 +148,164 @@ class _Comment extends State {
   void _showComment() {
     ///////////////////////////////////////////////////////////////POST/////////////////////////////////////////////
     http.post('${config.API_url}/comment/findAllComment',
-        body: {"topicId": _topicId.toString()}).then((response) {
-          print(response.body);
+        body: {"topicId": _topicId.toString()}).then((response) async {
+      print(response.body);
       Map res = jsonDecode(response.body);
 
       if (res["status"] == 0) {
         List temp = res["data"];
+        temp.sort((a, b) => b[0].compareTo(a[0]));
 
         for (int i = 0; i < temp.length; i++) {
           List data = temp[i];
           String _nameImage = "";
 
-          http.post('${config.API_url}/imageComment/getNameImages',
-              body: {"commentId": data[0].toString()}).then((response) {
-            Map jsonData = jsonDecode(response.body) as Map;
+          var resImage = await http.post(
+              '${config.API_url}/imageComment/getNameImages',
+              body: {"commentId": data[0].toString()});
+          print(resImage.body);
+          Map jsonData = jsonDecode(resImage.body) as Map;
 
-            if (jsonData['status'] == 0) {
-              Map imageName = jsonData['data'];
-              _nameImage = imageName['imageName'];
-            } else {
-              _nameImage = "";
-            }
+          if (jsonData['status'] == 0) {
+            Map imageName = jsonData['data'];
+            _nameImage = imageName['imageName'];
+          } else {
+            _nameImage = "";
+          }
 
-            Padding _card = Padding(
-              padding: EdgeInsets.all(8.0),
-              child: Container(
-                padding: EdgeInsets.only(top: 8, left: 8, right: 8, bottom: 8),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  border: Border.all(color: Colors.black54),
-                  borderRadius: BorderRadius.all(Radius.circular(10.0)),
-                ),
-                child: Column(
-                  children: <Widget>[
-                    Row(
-                      children: <Widget>[
-                        Padding(
-                          padding: EdgeInsets.all(5.0),
-                          child: Text('ความเห็น : ${data[2]}',
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold, fontSize: 18)),
-                        ),
-                      ],
-                    ),
-                    Padding(
-                      padding: EdgeInsets.only(top: 8, left: 8, right: 8),
-                      child: Container(
-                        padding: const EdgeInsets.all(15.0),
-                        decoration: BoxDecoration(
-                          color: Colors.grey,
-                          border: Border.all(color: Colors.black54),
-                          borderRadius: BorderRadius.all(Radius.circular(10.0)),
-                        ),
-                        child: Row(
-                          children: <Widget>[
-                            Expanded(
-                              child: Text(
-                                '${data[1]}',
-                                style: TextStyle(
-                                    fontSize: 14, color: Colors.white),
-                              ),
+          Padding _card = Padding(
+            padding: EdgeInsets.all(8.0),
+            child: Container(
+              padding: EdgeInsets.only(top: 8, left: 8, right: 8, bottom: 8),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                border: Border.all(color: Colors.black54),
+                borderRadius: BorderRadius.all(Radius.circular(10.0)),
+              ),
+              child: Column(
+                children: <Widget>[
+                  Row(
+                    children: <Widget>[
+                      Padding(
+                        padding: EdgeInsets.all(5.0),
+                        child: Text('ความเห็น : ${data[2]}',
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold, fontSize: 18)),
+                      ),
+                      data[2] == _username
+                          ? Container(
+                              padding: EdgeInsets.fromLTRB(150, 0, 0, 0),
+                              child: IconButton(
+                                  icon: Icon(Icons.clear),
+                                  onPressed: () {
+                                    Alert(
+                                      context: context,
+                                      type: AlertType.warning,
+                                      title: "คุณต้องการลบคอมเม้น ${data[1]}?",
+                                      buttons: [
+                                        DialogButton(
+                                          child: Text(
+                                            "ตกลง",
+                                            style: TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 20),
+                                          ),
+                                          onPressed: () => _onDelete(data[0]),
+                                          width: 120,
+                                        ),
+                                        DialogButton(
+                                          child: Text(
+                                            "ยกเลิก",
+                                            style: TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 20),
+                                          ),
+                                          onPressed: () =>
+                                              Navigator.pop(context),
+                                          width: 120,
+                                          color: Colors.redAccent,
+                                        )
+                                      ],
+                                    ).show();
+                                  }),
+                            )
+                          : Padding(padding: EdgeInsets.all(0)),
+                    ],
+                  ),
+                  Padding(
+                    padding: EdgeInsets.only(top: 8, left: 8, right: 8),
+                    child: Container(
+                      padding: const EdgeInsets.all(15.0),
+                      decoration: BoxDecoration(
+                        color: Colors.grey,
+                        border: Border.all(color: Colors.black54),
+                        borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                      ),
+                      child: Row(
+                        children: <Widget>[
+                          Expanded(
+                            child: Text(
+                              '${data[1]}',
+                              style:
+                                  TextStyle(fontSize: 14, color: Colors.white),
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                     ),
-                    _nameImage == "" || _nameImage == null
-                        ? Padding(
-                            padding: EdgeInsets.all(0.0),
-                          )
-                        : Container(
-                            child: RaisedButton(
-                            color: Colors.blue,
-                            onPressed: () {
-                              Alert(
-                                context: context,
-                                title: " ",
-                                buttons: [
-                                  DialogButton(
-                                    onPressed: () => Navigator.pop(context),
-                                    child: Text("ตกลง",
-                                        style: TextStyle(color: Colors.white)),
-                                  ),
-                                ],
-                                content: Image.network(
-                                  '${config.API_url}/imageComment/image?nameImage=' +
-                                      _nameImage,
-                                  scale: 1,
+                  ),
+                  _nameImage == "" || _nameImage == null
+                      ? Padding(
+                          padding: EdgeInsets.all(0.0),
+                        )
+                      : Container(
+                          child: RaisedButton(
+                          color: Colors.blue,
+                          onPressed: () {
+                            Alert(
+                              context: context,
+                              title: " ",
+                              buttons: [
+                                DialogButton(
+                                  onPressed: () => Navigator.pop(context),
+                                  child: Text("ตกลง",
+                                      style: TextStyle(color: Colors.white)),
                                 ),
-                              ).show();
-                            },
-                            child: Icon(
-                              Icons.image,
-                              color: Colors.white,
-                            ),
-                          )),
-                  ],
-                ),
+                              ],
+                              content: Image.network(
+                                '${config.API_url}/imageComment/image?nameImage=' +
+                                    _nameImage,
+                                scale: 1,
+                              ),
+                            ).show();
+                          },
+                          child: Icon(
+                            Icons.image,
+                            color: Colors.white,
+                          ),
+                        )),
+                ],
               ),
-            );
-            setState(() {
-              lstData.add(_card);
-            });
+            ),
+          );
+          setState(() {
+            lstData.add(_card);
           });
         }
+      }
+    });
+  }
+
+  void _onDelete(int id) {
+    http.post('${config.API_url}/comment/delete',
+        body: {"commentId": id.toString()}).then((response) {
+      print(response.body);
+      Map jsonData = jsonDecode(response.body);
+
+      if (jsonData['status'] == 0) {
+        lstData.clear();
+        _topic();
+        Navigator.pop(context);
       }
     });
   }
@@ -305,7 +368,7 @@ class _Comment extends State {
             _image = null;
             _comment.clear();
             lstData.removeRange(1, lstData.length);
-            _showComment();            
+            _showComment();
             Navigator.pop(context);
             Navigator.pop(context);
           }
@@ -322,7 +385,7 @@ class _Comment extends State {
       _image = null;
       _comment.clear();
       lstData.removeRange(1, lstData.length);
-      _showComment();      
+      _showComment();
       Navigator.pop(context);
     }
   }

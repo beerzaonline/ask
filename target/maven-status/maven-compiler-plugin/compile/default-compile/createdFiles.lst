@@ -1,6 +1,10 @@
 com/rmuti/ecp/ask/controller/CommentController.class
 com/rmuti/ecp/ask/model/service/UserProfileRepository.class
 com/rmuti/ecp/ask/controller/UserProfileController.class
+com/rmuti/ecp/ask/model/table/ImageComment.class
+com/rmuti/ecp/ask/controller/ImageCommentController.class
+com/rmuti/ecp/ask/model/service/ImageCommentRepository.class
+com/rmuti/ecp/ask/controller/ImageTopicController.class
 com/rmuti/ecp/ask/model/service/CommentRepository.class
 com/rmuti/ecp/ask/model/service/TopicRepository.class
 com/rmuti/ecp/ask/config/Swagger.class
@@ -12,4 +16,7 @@ com/rmuti/ecp/ask/DemoApplication.class
 com/rmuti/ecp/ask/model/table/Type.class
 com/rmuti/ecp/ask/model/service/TypeRepository.class
 com/rmuti/ecp/ask/model/table/Comment.class
+com/rmuti/ecp/ask/model/table/ImageTopic.class
+com/rmuti/ecp/ask/model/service/ImageTopicRepository.class
+com/rmuti/ecp/ask/controller/FlodersUpload.class
 com/rmuti/ecp/ask/model/table/Topic.class

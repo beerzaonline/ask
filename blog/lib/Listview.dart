@@ -90,110 +90,7 @@ class _listview extends State {
       if (jsonData.isNotEmpty) {
         for (int i = 0; i < jsonData.length; i++) {
           List topic = jsonData[i];
-
-          Padding card = Padding(
-            padding: EdgeInsets.all(8.0),
-            child: Card(
-              color: Colors.teal,
-              child: FlatButton(
-                onPressed: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (BuildContext) =>
-                              Comment(_userId, topic[0])));
-                },
-                child: Column(
-                  children: <Widget>[
-                    Padding(
-                      padding: EdgeInsets.all(5.0),
-                      child: Row(
-//                        mainAxisSize: MainAxisSize.min,
-                        children: <Widget>[
-                          Expanded(
-                            child: Text(
-                              "${topic[1]}",
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 20,
-                                  color: Colors.white),
-                            ),
-                          ),
-                          topic[2] == _username
-                              ? IconButton(
-                                  icon: Icon(Icons.clear),
-                                  color: Colors.white,
-                                  onPressed: () {
-                                    Alert(
-                                      context: context,
-                                      type: AlertType.info,
-                                      title: "คุณต้องการลบหัวข้อ ${topic[1]}?",
-                                      buttons: [
-                                        DialogButton(
-                                          child: Text(
-                                            "ตกลง",
-                                            style: TextStyle(color: Colors.white, fontSize: 20),
-                                          ),
-                                          onPressed: () {
-//                                            http.post('${config.API_url}/topic/delete',
-//                                                body: {
-//                                                  "topicId": topic[0]
-//                                                }).then((response) {
-//                                              print(response.body);
-//                                            });
-                                          },
-                                          width: 120,
-                                        ),
-                                        DialogButton(
-                                          child: Text(
-                                            "ยกเลิก",
-                                            style: TextStyle(color: Colors.white, fontSize: 20),
-                                          ),
-                                          onPressed: () => Navigator.pop(context),
-                                          width: 120,
-                                        )
-                                      ],
-                                    ).show();
-                                  })
-                              : Padding(padding: EdgeInsets.all(0))
-                        ],
-                      ),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.all(5.0),
-                      child: Row(
-                        children: <Widget>[
-                          Expanded(
-                            child: Container(
-                              padding: EdgeInsets.only(
-                                  top: 8, left: 8, right: 8, bottom: 8),
-                              decoration: BoxDecoration(
-                                border: Border.all(color: Colors.white),
-                              ),
-                              child: Text(
-                                '${topic[4]}',
-                                style: TextStyle(
-                                    fontWeight: FontWeight.normal,
-                                    fontSize: 10,
-                                    color: Colors.white),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Container(
-                      child: Text(
-                        "Post : ${topic[2]} , ${topic[3].toString().substring(0, 10)}",
-                        style: TextStyle(fontSize: 12, color: Colors.white),
-                      ),
-                    )
-                  ],
-                ),
-              ),
-            ),
-          );
-          lstData.add(card);
+          lstData.add(_card(topic,i));
           setState(() {});
         }
       } else {
@@ -223,6 +120,23 @@ class _listview extends State {
         // );
         // lstData.add(alarm);
         // setState(() {});
+      }
+    });
+  }
+
+  void _onDelete(List topic, int count) {
+    print(count);
+    print(topic);
+    http.post('${config.API_url}/topic/delete',
+        body: {"topicId": topic[0].toString()}).then((response) {
+      print(response.body);
+      Map jsonData = jsonDecode(response.body);
+
+      if (jsonData['status'] == 0) {
+        setState(() {
+          lstData.removeAt(count);
+        });
+        Navigator.pop(context);
       }
     });
   }
@@ -389,6 +303,106 @@ class _listview extends State {
             ],
           );
         });
+  }
+
+  Widget _card(List topic, int count) {
+    return Padding(
+      padding: EdgeInsets.all(8.0),
+      child: Card(
+        color: Colors.teal,
+        child: FlatButton(
+          onPressed: () {
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (BuildContext) => Comment(_userId, topic[0])));
+          },
+          child: Column(
+            children: <Widget>[
+              Padding(
+                padding: EdgeInsets.all(5.0),
+                child: Row(
+//                        mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    Expanded(
+                      child: Text(
+                        "${topic[1]}",
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 20,
+                            color: Colors.white),
+                      ),
+                    ),
+                    topic[2] == _username
+                        ? IconButton(
+                            icon: Icon(Icons.clear),
+                            color: Colors.white,
+                            onPressed: () {
+                              Alert(
+                                context: context,
+                                type: AlertType.warning,
+                                title: "คุณต้องการลบหัวข้อ ${topic[1]}?",
+                                buttons: [
+                                  DialogButton(
+                                    child: Text(
+                                      "ตกลง",
+                                      style: TextStyle(
+                                          color: Colors.white, fontSize: 20),
+                                    ),
+                                    onPressed: () => _onDelete(topic, count),
+                                    width: 120,
+                                  ),
+                                  DialogButton(
+                                    child: Text(
+                                      "ยกเลิก",
+                                      style: TextStyle(
+                                          color: Colors.white, fontSize: 20),
+                                    ),
+                                    onPressed: () => Navigator.pop(context),
+                                    width: 120,
+                                    color: Colors.redAccent,
+                                  )
+                                ],
+                              ).show();
+                            })
+                        : Padding(padding: EdgeInsets.all(0))
+                  ],
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.all(5.0),
+                child: Row(
+                  children: <Widget>[
+                    Expanded(
+                      child: Container(
+                        padding: EdgeInsets.only(
+                            top: 8, left: 8, right: 8, bottom: 8),
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Colors.white),
+                        ),
+                        child: Text(
+                          '${topic[4]}',
+                          style: TextStyle(
+                              fontWeight: FontWeight.normal,
+                              fontSize: 10,
+                              color: Colors.white),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                child: Text(
+                  "Post : ${topic[2]} , ${topic[3].toString().substring(0, 10)}",
+                  style: TextStyle(fontSize: 12, color: Colors.white),
+                ),
+              )
+            ],
+          ),
+        ),
+      ),
+    ); //
   }
 
   Widget getItem(BuildContext context, int index) {
