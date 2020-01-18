@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.rmuti.ecp.ask.model.bean.APIResponse;
 import com.rmuti.ecp.ask.model.service.TypeRepository;
+import com.rmuti.ecp.ask.model.table.Topic;
 import com.rmuti.ecp.ask.model.table.Type;
 
 @RestController
@@ -18,8 +19,13 @@ public class TypeController {
     @PostMapping("/add")
     public Object add(Type type) {
         APIResponse res = new APIResponse();
-        typeRepository.save(type);
-        res.setMessage(type.getTypeName());
+        Type type_db = typeRepository.findByTypeName(type.getTypeName());
+        if(type_db == null){
+            res.setStatus(0);
+            typeRepository.save(type);
+        }else{
+            res.setStatus(1);
+        }
         return res;
     }
 

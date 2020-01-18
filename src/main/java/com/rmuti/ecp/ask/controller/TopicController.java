@@ -22,6 +22,7 @@ public class TopicController {
     public Object save(Topic topic) {
         APIResponse res = new APIResponse();
         topicRepository.save(topic);
+        res.setData(topic.getId());
         return res;
     }
 
